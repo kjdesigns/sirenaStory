@@ -35,9 +35,11 @@ var GetRandom = function(item){
 var gameState={
     
       init:function(currentLevel){
-      this.currentLevel=this.currentLevel || 2;
+      this.currentLevel=this.currentLevel || 0;
       
       
+       
+        
       
        //Set the type of scaling to 'show all'
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -59,6 +61,7 @@ var gameState={
         game.load.image("ocean","assets/ocean.png");
         game.load.image("ocean2","assets/ocean2.png");
         game.load.image("starFish","assets/starFish.png");
+        game.load.image("bubble","assets/bubble1.png");
         
         game.load.audio("mistyIntro","assets/audio/mistyIntro.mp3");
         game.load.audio("imSirena","assets/audio/imSirena.mp3");
@@ -66,15 +69,24 @@ var gameState={
         game.load.audio("sirena2","assets/audio/sirena2.mp3");
         game.load.audio("sirena3","assets/audio/sirena3.mp3");
         game.load.audio("sirenaScene2","assets/audio/sirenaScene2.mp3");
+        game.load.audio("pop","assets/audio/sounds/pop.mp3");
+        game.load.audio("wee","assets/audio/wee.mp3");
+        game.load.audio("jellyFish","assets/audio/jellyFish.mp3");
+        game.load.audio("duck","assets/audio/duck.mp3");
+        game.load.audio("scene3","assets/audio/scene3.mp3");
         
         
         game.load.spritesheet("sirena","assets/sirena_spritesheet.png",360,260);
         game.load.spritesheet("jellyFish","assets/jellyfish_spritesheet.png",323,295);
+        game.load.spritesheet("duck","assets/duck_walk.png",64,68);
     },
     
     create:function(){
         
-       
+         //Start physics system
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+        
+   
           
           
         
@@ -85,12 +97,21 @@ var gameState={
         this.a_sirena2 =game.add.audio("sirena2");
         this.a_sirena3 =game.add.audio("sirena3");
         this.a_sirenaScene2 =game.add.audio("sirenaScene2");
+        this.a_pop =game.add.audio("pop");
+        this.a_wee =game.add.audio("wee");
+        this.a_wee.volume=0.2;
+        this.a_jellyFish=game.add.audio("jellyFish");
+        this.a_duck=game.add.audio("duck");
+        this.a_scene3=game.add.audio("scene3");
         
-        this.soundsArray=[this.a_intro,this.a_imSirena,this.a_sirena1,this.a_sirena2,this.a_sirena3,this.a_sirenaScene2];
+        
+        this.soundsArray=[this.a_intro,this.a_imSirena,this.a_sirena1,this.a_sirena2,this.a_sirena3,this.a_sirenaScene2,this.a_pop,this.a_wee,this.a_jellyFish,this.a_duck,this.a_scene3];
         this.sirenaSoundArray=[this.a_imSirena,this.a_sirena1,this.a_sirena2,this.a_sirena3];
         
         //Draw the level 
         this.drawLevel();
+        
+      
     },
     
     nextState:function(){
@@ -175,13 +196,29 @@ var gameState={
              
         }else if(this.currentLevel==2){
             var canRotate=true;
-            var background=this.game.add.sprite(0,0,level.background.key);
+            var background=game.add.sprite(0,0,level.background.key);
+            background.inputEnabled=true;
+            background.events.onInputDown.add(this.particleBurst,this);
+            //play the scene audio
+            this.a_scene3.play();
+        
+            //Emitter
+        //   this.emitter = game.add.emitter(0,0,100);
+        //   this.emitter.makeParticles("bubble");
+        //   this.emitter.gravity=200;
+        
+        var scene3Text = game.add.text(100,100,"I love to swim in the ocean,\nhowever my favorite spot is the\nMinondo River",{font:"18px Arial",fill:"#fff",align:"center"});
+            
             var jellyFish = this.game.add.sprite(level.jellyFish.x,level.jellyFish.y,level.jellyFish.key);
             jellyFish.animations.add("swim",[0,4,8,4],5,true);
             jellyFish.animations.play("swim");
             jellyFish.scale.setTo(0.3);
             jellyFish.angle+=45
             game.add.tween(jellyFish).to({x:-200},7500,Phaser.Easing.Quadratic.InOut,true,0,1000,false);
+            jellyFish.inputEnabled=true;
+            jellyFish.events.onInputDown.add(function(){
+              this.a_jellyFish.play();  
+            },this);
             
             var starFish = game.add.sprite(level.starFish.x,level.starFish.y,level.starFish.key);
             starFish.anchor.setTo(0.5);
@@ -191,6 +228,7 @@ var gameState={
                  var starFishTween = game.add.tween(starFish).to({angle:360},2000,Phaser.Easing.Linear.None,false); 
                 if(canRotate){
                     starFishTween.start();
+                    this.a_wee.play()
                     canRotate=false;
                 }
                 
@@ -202,9 +240,26 @@ var gameState={
             game.add.tween(starFish).to({angle:360},2000,Phaser.Easing.Linear.None,true);
             
             
-           // game.add.tween(sprite).to( { angle: 45 }, 2000, Phaser.Easing.Linear.None, true);
+           var duck = game.add.sprite(300,300,"duck");
+           duck.animations.add("walk",[0,1,2,3,2,1,0,0],8,false);
+           duck.inputEnabled=true;
+           duck.animations.play("walk")
+           duck.events.onInputDown.add(function(){
+               if(canRotate){
+                   duck.animations.play("walk");
+                   this.a_duck.play();
+                   canRotate=false;
+               }
+               
+                this.game.time.events.add(1000,function(){
+                        canRotate=true;
+                  },this);
+               
+               
+           },this);
+        //   duck.animations.play("walk");
             
-            
+        
             
             
             
@@ -225,8 +280,24 @@ var gameState={
     playMyCharacterSound:function(keyName){
         keyName.play();
         
-    }
+    },
+    particleBurst:function(event) {
+        console.log("emitter started")
+        var x = game.input.x;
+        var y = game.input.y;
     
+        var emitter = game.add.emitter(x,y,100);
+        emitter.makeParticles("bubble");
+        emitter.gravity=200;
+        emitter.start(true, 2000, null, 10);
+        this.a_pop.play();
+        //if we want to collide emitter we need to do it in the update method
+        //game.physics.arcade.collide(emitter);
+    
+    
+    },
+    
+   
 }
 
 
