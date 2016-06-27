@@ -2,6 +2,7 @@ var colors=["#facade","#beefed","#afaded","#ffc966","#ff5050"];
 var randColor=Math.floor(Math.random()*colors.length);
 var w=450;
 var h=550;
+var hut;
 
 
 var levelData=[
@@ -12,14 +13,22 @@ var levelData=[
         },
         {
             sirena:{x:100,y:100,key:"sirena"},
-            background:{key:"water"},
+            background:{key:"islandBackground"},
             sceneText:"Gauhu si sirena, taotao Hagatna. \nLiving on a bautifil island. \nI love to swim",
-            nextArrow:{x:w-50,y:h/2,key:"arrow"}
+            nextArrow:{x:w-50,y:h/2,key:"arrow"},
+            squid:[{x:100,y:h/2,key:"squid",frame:0},{x:w-75,y:h-100,key:"squid",frame:1},{x:w-150,y:h/2+75,key:"squid",frame:2}]
         },
         {
             background:{key:"ocean2"},
             jellyFish:{x:w,y:100,key:"jellyFish"},
             starFish:{x:100,y:h-100,key:"starFish"}
+        },
+        {
+            background:{key:"outdoor"},
+            hut:{x:100,y:h/2-50,key:"hut"},
+            trash:[{x:40,y:h/2+20,key:"log"},{x:130,y:h/2+20},{x:160,y:350},{x:300,y:250}],
+            sceneText:"Whenever I get a chance\nI would sneak away,\noften times i forget about my chores\nto go swimming",
+            sceneText2:"Help with Sirena's chores\n and put the logs in the hut"
         }
     
     
@@ -35,7 +44,7 @@ var GetRandom = function(item){
 var gameState={
     
       init:function(currentLevel){
-      this.currentLevel=this.currentLevel || 0;
+      this.currentLevel=this.currentLevel || 3;
       
       
        
@@ -62,6 +71,11 @@ var gameState={
         game.load.image("ocean2","assets/ocean2.png");
         game.load.image("starFish","assets/starFish.png");
         game.load.image("bubble","assets/bubble1.png");
+        game.load.image("islandBackground","assets/islandBackground.png");
+        game.load.image("outdoor","assets/outdoor2.jpg");
+        game.load.image("hut","assets/hut.png");
+        game.load.image("log","assets/log.png");
+        
         
         game.load.audio("mistyIntro","assets/audio/mistyIntro.mp3");
         game.load.audio("imSirena","assets/audio/imSirena.mp3");
@@ -79,6 +93,7 @@ var gameState={
         game.load.spritesheet("sirena","assets/sirena_spritesheet.png",360,260);
         game.load.spritesheet("jellyFish","assets/jellyfish_spritesheet.png",323,295);
         game.load.spritesheet("duck","assets/duck_walk.png",64,68);
+        game.load.spritesheet("squid","assets/squid_spritesheet.png",64,64);
     },
     
     create:function(){
@@ -112,6 +127,14 @@ var gameState={
         this.drawLevel();
         
       
+    },
+    
+    update:function(){
+        if(this.currentLevel==3){
+             game.physics.arcade.overlap(hut,this.logs,this.killLogs,null,this);
+        }
+       
+   
     },
     
     nextState:function(){
@@ -194,6 +217,33 @@ var gameState={
              var sceneText=game.add.text(game.world.centerX,game.world.centerY+200,level.sceneText,{font:"25px Arial",fill:"#fff",align:"center"});
              sceneText.anchor.setTo(0.5);
              
+             //loop through the data for all the squid
+             this.squidsGroup=game.add.group();
+             var squidSprite;
+             var squidData = levelData[this.currentLevel].squid;
+             if(squidData){
+                 squidData.forEach(function(element){
+                     squidSprite = game.add.sprite(element.x,element.y,element.key,element.frame);
+                     squidSprite.inputEnabled=true;
+                    
+                     this.squidsGroup.add(squidSprite);
+                    
+                     
+                 },this);
+                 
+             }
+             
+            
+            //change the color of the squid when clicked
+            this.squidsGroup.forEach(function(element){
+                element.events.onInputDown.add(function(){
+                    var frame=Math.floor((Math.random()*9)-1);
+                    element.frame=frame;
+                },this)
+            },this);
+             
+            
+             
         }else if(this.currentLevel==2){
             var canRotate=true;
             var background=game.add.sprite(0,0,level.background.key);
@@ -267,6 +317,36 @@ var gameState={
             
             
         }
+        else if(this.currentLevel==3){
+            //Scene4
+            var background=game.add.sprite(0,0,level.background.key);
+            hut=game.add.sprite(level.hut.x,level.hut.y,level.hut.key);
+            game.physics.arcade.enable(hut);
+            this.addQuake(hut);
+            
+            this.logs = game.add.group();
+            var logSprite;
+            level.trash.forEach(function(element){
+                logSprite=game.add.sprite(element.x,element.y,"log");
+                this.game.physics.arcade.enable(logSprite);
+                logSprite.inputEnabled=true;
+                logSprite.collideWorldBounds = true;
+                logSprite.input.enableDrag(true);
+                logSprite.body.setSize(25,25,25,25);
+                
+                this.logs.add(logSprite);
+             
+            },this);
+            //add the text on the screen
+            var style = {font:"18px Arial",fill:"#fff",align:"center"}
+            var sceneText = game.add.text(w/2,h-50,level.sceneText,style);
+            sceneText.anchor.setTo(0.5);
+            
+            var sceneText2 = game.add.text(w/2,50,level.sceneText2,{font:"18px Arial",fill:"#e50044",align:"center"});
+            sceneText2.anchor.setTo(0.5)
+            
+        }
+        
     },//END DRAW LEVEL
     
     checkIfSoundIsPlaying:function(){
@@ -296,6 +376,52 @@ var gameState={
     
     
     },
+    addQuake:function(sprite){
+        // define the camera offset for the quake
+      var rumbleOffset = 10;
+      
+      // we need to move according to the camera's current position
+      var properties = {
+        x: sprite.x - rumbleOffset
+      };
+      
+      // we make it a relly fast movement
+      var duration = 100;
+      // because it will repeat
+      var repeat = 4;
+      // we use bounce in-out to soften it a little bit
+      var ease = Phaser.Easing.Bounce.InOut;
+      var autoStart = false;
+      // a little delay because we will run it indefinitely
+      var delay = 1000;
+      // we want to go back to the original position
+      var yoyo = true;
+      
+      var quake = game.add.tween(sprite)
+        .to(properties, duration, ease, autoStart, delay, 4, yoyo);
+      
+      // we're using this line for the example to run indefinitely
+      quake.onComplete.addOnce(this.addQuake,this);
+      
+      // let the earthquake begins
+      quake.start();
+    },
+    
+    killLogs(house,log){
+        log.kill();
+    },
+    
+    render:function(){
+       if(this.currentLevel==3){
+             this.logs.forEach(function(element){
+                     game.debug.body(element);
+                 },this)
+        }
+        
+        
+       
+    }
+
     
    
 }
