@@ -4,7 +4,6 @@ var w=450;
 var h=550;
 var hut;
 var numLogs=-1;
-var numDolphin=5;
 
 
 var levelData=[
@@ -37,7 +36,7 @@ var levelData=[
         {
             background:{key:"waterBackground"},
             sceneText:"Being a young teen, I was really rebellous.\nI would rather swim than do anything else.\nOne day while doing chores,\nI had snuck away to go swimming",
-            dolphin:[{x:75,y:200,key:"dolphin1"},{x:200,y:250,key:"dolphin2"},{x:300,y:300,key:"dolphin3"}/*gray*/,{x:20,y:400,key:"dolphin4"},{x:50,y:300,key:"dolphin5"}]
+            dolphin:[{x:100,y:100,key:"dolphin1"},{x:200,y:200,key:"dolphin2"},{x:300,y:300,key:"dolphin3"},{x:100,y:300,key:"dolphin4"},{x:300,y:300,key:"dolphin5"}]
             
         }
     
@@ -103,17 +102,24 @@ var gameState={
         game.load.audio("s1","assets/audio/s1.mp3");//intro
         game.load.audio("s2","assets/audio/s2.mp3");//scene2
         game.load.audio("s3","assets/audio/s3.mp3");
-        game.load.audio("s4","assets/audio/s4.mp3");
         game.load.audio("awesome","assets/audio/awesome.mp3");
         game.load.audio("good_job","assets/audio/good_job.mp3");
         game.load.audio("almost_done","assets/audio/almost_done.mp3");
         game.load.audio("yeah_you_did_it","assets/audio/yeah_you_did_it.mp3");
         
-        game.load.audio("one","assets/audio/one.mp3");
-        game.load.audio("two","assets/audio/two.mp3");
-        game.load.audio("three","assets/audio/three.mp3");
-        game.load.audio("four","assets/audio/four.mp3");
-        game.load.audio("five","assets/audio/five.mp3");
+        
+        
+        //game.load.audio("imSirena","assets/audio/imSirena.mp3");
+        
+        //game.load.audio("sirena2","assets/audio/sirena2.mp3");
+        //game.load.audio("sirena3","assets/audio/sirena3.mp3");
+        //game.load.audio("sirenaScene2","assets/audio/sirenaScene2.mp3");
+        //game.load.audio("pop","assets/audio/sounds/pop.mp3");
+        //game.load.audio("wee","assets/audio/wee.mp3");
+        //game.load.audio("jellyFish","assets/audio/jellyFish.mp3");
+        //game.load.audio("duck","assets/audio/duck.mp3");
+        //game.load.audio("scene3","assets/audio/scene3.mp3");
+        
         
         
         //game.load.spritesheet("sirena","assets/sirena_spritesheet.png",360,260);
@@ -135,27 +141,34 @@ var gameState={
         this.a_intro= game.add.audio("s1");
         this.a_s2 =game.add.audio("s2");
         this.a_s3=game.add.audio("s3");
-        this.a_s4=game.add.audio("s4");
+        //this.a_imSirena= game.add.audio("imSirena");
+        //this.a_sirena2 =game.add.audio("sirena2");
+        //this.a_sirena3 =game.add.audio("sirena3");
        
+        //this.a_pop =game.add.audio("pop");
+        //this.a_wee =game.add.audio("wee");
+        //this.a_wee.volume=0.2;
+        //this.a_jellyFish=game.add.audio("jellyFish");
+        //this.a_duck=game.add.audio("duck");
+        //this.a_scene3=game.add.audio("scene3");//ken
         
-        //dolfin
-        this.a_1 = this.game.add.audio("one");
-        this.a_2 = this.game.add.audio("two");
-        this.a_3 = this.game.add.audio("three");
-        this.a_4 = this.game.add.audio("four");
-        this.a_5 = this.game.add.audio("five");
         
-        //log audio
+        this.a_1 = this.game.add.audio("first");
+        this.a_2 = this.game.add.audio("second");
+        this.a_3 = this.game.add.audio("third");
+        this.a_4 = this.game.add.audio("fouth");
+        this.a_5 = this.game.add.audio("fifth");
+        
         this.awesome=this.game.add.audio("awesome");
         this.good_job=this.game.add.audio("good_job");
         this.almost_done=this.game.add.audio("almost_done");
         this.yeah_you_did_it=this.game.add.audio("yeah_you_did_it");
         
-        this.dolfinAudio = [this.a_5,this.a_4,this.a_3,this.a_2,this.a_1];
+        this.successAudio = [this.a_5,this.a_4,this.a_3,this.a_2,this.a_1];
         this.logsAudio=[this.awesome,this.good_job,this.almost_done,this.yeah_you_did_it];
         
         
-        this.soundsArray=[this.a_intro,this.a_s2,this.a_s3,this.a_s4,this.a_5,this.a_4,this.a_3,this.a_2,this.a_1];
+        this.soundsArray=[this.a_intro,this.a_s2,this.a_s3,this.a_5,this.a_4,this.a_3,this.a_2,this.a_1];
         //this.sirenaSoundArray=[this.a_imSirena,this.a_sirena2,this.a_sirena3];
         
         //Draw the level 
@@ -224,7 +237,8 @@ var gameState={
              //this.sirena = this.game.add.sprite(level.sirena.x,level.sirena.y,"sirena");
              this.sirena.scale.setTo(0.5);
              this.sirena.anchor.setTo(0.5);
-          
+            //  this.sirena.animations.add("happyFace",[3,4],2,true);
+            //  this.sirena.animations.play("happyFace");
              this.a_s2.play();
              
               var previousButton = game.add.button(50,level.nextArrow.y,level.nextArrow.key,this.previousState,this);
@@ -285,14 +299,94 @@ var gameState={
             
              
         }
- 
+        // else if(this.currentLevel==2){
+        //     var canRotate=true;
+        //     var background=game.add.sprite(0,0,level.background.key);
+        //     background.inputEnabled=true;
+        //     background.events.onInputDown.add(this.particleBurst,this);
+        //     //play the scene audio
+        //     this.a_scene3.play();
+        
+        //     //Emitter
+        // //   this.emitter = game.add.emitter(0,0,100);
+        // //   this.emitter.makeParticles("bubble");
+        // //   this.emitter.gravity=200;
+        
+        // var scene3Text = game.add.text(100,100,"I love to swim in the ocean,\nhowever my favorite spot is the\nMinondo River",{font:"18px Arial",fill:"#fff",align:"center"});
+            
+        //     var jellyFish = this.game.add.sprite(level.jellyFish.x,level.jellyFish.y,level.jellyFish.key);
+        //     jellyFish.animations.add("swim",[0,4,8,4],5,true);
+        //     jellyFish.animations.play("swim");
+        //     jellyFish.scale.setTo(0.3);
+        //     jellyFish.angle+=45
+        //     game.add.tween(jellyFish).to({x:-200},7500,Phaser.Easing.Quadratic.InOut,true,0,1000,false);
+        //     jellyFish.inputEnabled=true;
+        //     jellyFish.events.onInputDown.add(function(){
+        //       this.a_jellyFish.play();  
+        //     },this);
+            
+        //     var starFish = game.add.sprite(level.starFish.x,level.starFish.y,level.starFish.key);
+        //     starFish.anchor.setTo(0.5);
+        //     starFish.scale.setTo(0.7);
+        //     starFish.inputEnabled=true;
+        //     starFish.events.onInputDown.add(function(){
+        //          var starFishTween = game.add.tween(starFish).to({angle:360},2000,Phaser.Easing.Linear.None,false); 
+        //         if(canRotate){
+        //             starFishTween.start();
+        //             this.a_wee.play()
+        //             canRotate=false;
+        //         }
+                
+        //         starFishTween.onComplete.add(function(){
+        //             canRotate=true;
+        //         },this);
+              
+        //     },this);
+        //     game.add.tween(starFish).to({angle:360},2000,Phaser.Easing.Linear.None,true);
+            
+            
+        //   var duck = game.add.sprite(300,300,"duck");
+        //   duck.animations.add("walk",[0,1,2,3,2,1,0,0],8,false);
+        //   duck.inputEnabled=true;
+        //   duck.animations.play("walk")
+        //   duck.events.onInputDown.add(function(){
+        //       if(canRotate){
+        //           duck.animations.play("walk");
+        //           this.a_duck.play();
+        //           canRotate=false;
+        //       }
+               
+        //         this.game.time.events.add(1000,function(){
+        //                 canRotate=true;
+        //           },this);
+               
+               
+        //   },this);
+        // //   duck.animations.play("walk");
+        // //add the next and prevous buttons
+        //      var nextButton = game.add.button(level.nextArrow.x,level.nextArrow.y,level.nextArrow.key,this.nextState,this);
+        //      nextButton.anchor.setTo(0.5);
+        //      nextButton.scale.setTo(0.5);
+                
+        //      var previousButton = game.add.button(50,level.nextArrow.y,level.nextArrow.key,this.previousState,this);
+        //      previousButton.anchor.setTo(0.5);
+        //      previousButton.scale.setTo(0.5);
+        //      previousButton.scale.x=-0.5;
+        
+            
+            
+            
+            
+            
+            
+        // }
         else if(this.currentLevel==2){
             //Scene4
             this.a_s3.play();
             var background=game.add.sprite(0,0,level.background.key);
             hut=game.add.sprite(level.hut.x,level.hut.y,level.hut.key);
-            //game.physics.arcade.enable(hut);
-            //this.addQuake(hut);
+            game.physics.arcade.enable(hut);
+            this.addQuake(hut);
             
             this.logs = game.add.group();
             var logSprite;
@@ -314,17 +408,7 @@ var gameState={
             sceneText.anchor.setTo(0.5);
             
             var sceneText2 = game.add.text(w/2,50,level.sceneText2,{font:"18px Arial",fill:"#e50044",align:"center"});
-            sceneText2.anchor.setTo(0.5);
-            
-            var nextButton = game.add.button(level.nextArrow.x,level.nextArrow.y,level.nextArrow.key,this.nextState,this);
-            nextButton.anchor.setTo(0.5);
-            nextButton.scale.setTo(0.5);
-        
-            var previousButton = game.add.button(50,level.nextArrow.y,level.nextArrow.key,this.previousState,this);
-            previousButton.anchor.setTo(0.5);
-            previousButton.scale.setTo(0.5);
-            previousButton.scale.x=-0.5;
-             
+            sceneText2.anchor.setTo(0.5)
             
         }else if(this.currentLevel==3){
             //var background = game.add.sprite(0,0,level.background.key);
@@ -334,8 +418,6 @@ var gameState={
             var sceneText=game.add.text(w/2,100,level.sceneText,style)
             sceneText.anchor.setTo(0.5);
             
-            this.a_s4.play();
-            
             var dolphinGroup = game.add.group();
             var dolphinData=levelData[this.currentLevel].dolphin;
             var dophin1=dolphinGroup.create(dolphinData[0].x,dolphinData[0].y,dolphinData[0].key);
@@ -343,12 +425,6 @@ var gameState={
             var dophin3=dolphinGroup.create(dolphinData[2].x,dolphinData[2].y,dolphinData[2].key);
             var dophin4=dolphinGroup.create(dolphinData[3].x,dolphinData[3].y,dolphinData[3].key);
             var dophin5=dolphinGroup.create(dolphinData[4].x,dolphinData[4].y,dolphinData[4].key);
-            
-            dolphinGroup.forEach(function(element){
-                element.inputEnabled=true;
-                element.events.onInputDown.add(this.killDolphin,this);
-              
-            },this);
             
             
             
@@ -388,36 +464,36 @@ var gameState={
     
     
     },
-    // addQuake:function(sprite){
-    //     // define the camera offset for the quake
-    //   var rumbleOffset = 10;
+    addQuake:function(sprite){
+        // define the camera offset for the quake
+      var rumbleOffset = 10;
       
-    //   // we need to move according to the camera's current position
-    //   var properties = {
-    //     x: sprite.x - rumbleOffset
-    //   };
+      // we need to move according to the camera's current position
+      var properties = {
+        x: sprite.x - rumbleOffset
+      };
       
-    //   // we make it a relly fast movement
-    //   var duration = 100;
-    //   // because it will repeat
-    //   var repeat = 4;
-    //   // we use bounce in-out to soften it a little bit
-    //   var ease = Phaser.Easing.Bounce.InOut;
-    //   var autoStart = false;
-    //   // a little delay because we will run it indefinitely
-    //   var delay = 1000;
-    //   // we want to go back to the original position
-    //   var yoyo = true;
+      // we make it a relly fast movement
+      var duration = 100;
+      // because it will repeat
+      var repeat = 4;
+      // we use bounce in-out to soften it a little bit
+      var ease = Phaser.Easing.Bounce.InOut;
+      var autoStart = false;
+      // a little delay because we will run it indefinitely
+      var delay = 1000;
+      // we want to go back to the original position
+      var yoyo = true;
       
-    //   var quake = game.add.tween(sprite)
-    //     .to(properties, duration, ease, autoStart, delay, 4, yoyo);
+      var quake = game.add.tween(sprite)
+        .to(properties, duration, ease, autoStart, delay, 4, yoyo);
       
-    //   // we're using this line for the example to run indefinitely
-    //   quake.onComplete.addOnce(this.addQuake,this);
+      // we're using this line for the example to run indefinitely
+      quake.onComplete.addOnce(this.addQuake,this);
       
-    //   // let the earthquake begins
-    //   quake.start();
-    // },
+      // let the earthquake begins
+      quake.start();
+    },
     
     // killLogs(house,log){
     //     log.kill();
@@ -429,31 +505,20 @@ var gameState={
         this.logsAudio[numLogs].play();
     },
     
-    killDolphin:function(dolphine){
-        var tween =game.add.tween(dolphine).to({y:dolphine.y-40,alpha:0},1000,Phaser.Easing.Quadratic.InOut,true,1);
-          tween.onComplete.add(function(){
-              dolphine.kill();
-          },this);
-        //dolphine.kill();
-        numDolphin--;
-        this.dolfinAudio[numDolphin].play();
-        
-    }
-    
-    // render:function(){
-    //   if(this.currentLevel==2){
-    //          this.logs.forEach(function(element){
-    //                  game.debug.body(element);
-    //              },this)
-    //     }
+    render:function(){
+       if(this.currentLevel==3){
+             this.logs.forEach(function(element){
+                     game.debug.body(element);
+                 },this)
+        }
         
         
        
-    // }
+    }
 
     
    
-};
+}
 
 
 
