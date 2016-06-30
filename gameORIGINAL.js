@@ -3,7 +3,6 @@ var randColor=Math.floor(Math.random()*colors.length);
 var w=450;
 var h=550;
 var hut;
-var numLogs=-1;
 
 
 var levelData=[
@@ -101,14 +100,6 @@ var gameState={
         
         game.load.audio("s1","assets/audio/s1.mp3");//intro
         game.load.audio("s2","assets/audio/s2.mp3");//scene2
-        game.load.audio("s3","assets/audio/s3.mp3");
-        game.load.audio("awesome","assets/audio/awesome.mp3");
-        game.load.audio("good_job","assets/audio/good_job.mp3");
-        game.load.audio("almost_done","assets/audio/almost_done.mp3");
-        game.load.audio("yeah_you_did_it","assets/audio/yeah_you_did_it.mp3");
-        
-        
-        
         game.load.audio("imSirena","assets/audio/imSirena.mp3");
         
         game.load.audio("sirena2","assets/audio/sirena2.mp3");
@@ -119,7 +110,7 @@ var gameState={
         game.load.audio("jellyFish","assets/audio/jellyFish.mp3");
         game.load.audio("duck","assets/audio/duck.mp3");
         game.load.audio("scene3","assets/audio/scene3.mp3");
-        
+        game.load.audio("s3","assets/audio/s3.mp3");
         
         
         game.load.spritesheet("sirena","assets/sirena_spritesheet.png",360,260);
@@ -149,8 +140,7 @@ var gameState={
         this.a_wee.volume=0.2;
         this.a_jellyFish=game.add.audio("jellyFish");
         this.a_duck=game.add.audio("duck");
-        this.a_scene3=game.add.audio("scene3");//ken
-        this.a_s3=game.add.audio("s3");
+        this.a_scene3=game.add.audio("scene3");
         
         this.a_1 = this.game.add.audio("first");
         this.a_2 = this.game.add.audio("second");
@@ -158,16 +148,10 @@ var gameState={
         this.a_4 = this.game.add.audio("fouth");
         this.a_5 = this.game.add.audio("fifth");
         
-        this.awesome=this.game.add.audio("awesome");
-        this.good_job=this.game.add.audio("good_job");
-        this.almost_done=this.game.add.audio("almost_done");
-        this.yeah_you_did_it=this.game.add.audio("yeah_you_did_it");
-        
         this.successAudio = [this.a_5,this.a_4,this.a_3,this.a_2,this.a_1];
-        this.logsAudio=[this.awesome,this.good_job,this.almost_done,this.yeah_you_did_it];
         
         
-        this.soundsArray=[this.a_intro,this.a_s2,this.a_s3,this.a_imSirena,,this.a_sirena2,this.a_sirena3,this.a_pop,this.a_wee,this.a_jellyFish,this.a_duck,this.a_scene3,this.a_5,this.a_4,this.a_3,this.a_2,this.a_1];
+        this.soundsArray=[this.a_intro,this.a_s2,this.a_imSirena,,this.a_sirena2,this.a_sirena3,this.a_pop,this.a_wee,this.a_jellyFish,this.a_duck,this.a_scene3,this.a_5,this.a_4,this.a_3,this.a_2,this.a_1];
         this.sirenaSoundArray=[this.a_imSirena,this.a_sirena2,this.a_sirena3];
         
         //Draw the level 
@@ -177,12 +161,12 @@ var gameState={
     },
     
     update:function(){
-       // if(this.currentLevel==3){
-       //      game.physics.arcade.overlap(hut,this.logs,this.killLogs,null,this);
+        if(this.currentLevel==3){
+             game.physics.arcade.overlap(hut,this.logs,this.killLogs,null,this);
             //  if(this.logs.total==0){
             //      console.log("Hey no more logs");
             //  }
-       // }
+        }
        
    
     },
@@ -380,7 +364,6 @@ var gameState={
         }
         else if(this.currentLevel==3){
             //Scene4
-            this.a_s3.play();
             var background=game.add.sprite(0,0,level.background.key);
             hut=game.add.sprite(level.hut.x,level.hut.y,level.hut.key);
             game.physics.arcade.enable(hut);
@@ -393,11 +376,10 @@ var gameState={
                 this.game.physics.arcade.enable(logSprite);
                 logSprite.inputEnabled=true;
                 logSprite.collideWorldBounds = true;
-                //logSprite.input.enableDrag(true);
-                //logSprite.body.setSize(25,25,25,25);
+                logSprite.input.enableDrag(true);
+                logSprite.body.setSize(25,25,25,25);
                 
                 this.logs.add(logSprite);
-                logSprite.events.onInputDown.add(this.killLogs,this);
              
             },this);
             //add the text on the screen
@@ -493,14 +475,8 @@ var gameState={
       quake.start();
     },
     
-    // killLogs(house,log){
-    //     log.kill();
-    // },
-    
-     killLogs(log){
+    killLogs(house,log){
         log.kill();
-        numLogs++
-        this.logsAudio[numLogs].play();
     },
     
     render:function(){
