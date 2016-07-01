@@ -9,12 +9,13 @@ var numDolphin=5;
 
 var levelData=[
         {
-            misty:{x:-300,y:0,key:"misty"},
-            playButton:{x:w-100,y:h/2,key:"playButton"}
+            atani:{x:-300,y:h/2-110,key:"atani"},
+            playButton:{x:w-100,y:h/2,key:"playButton"},
+            background:{key:"introBackground"}
             
         },
         {
-            sirena:{x:100,y:200,key:"sirena"},
+            sirena:{x:100,y:200,key:"sirena2"},
             background:{key:"islandBackground"},
             sceneText:"Gauhu si sirena, taotao Hagatna. \nLiving on a bautifil island. \nI love to swim",
             nextArrow:{x:w-50,y:h/2,key:"arrow"},
@@ -37,8 +38,14 @@ var levelData=[
         {
             background:{key:"waterBackground"},
             sceneText:"Being a young teen, I was really rebellous.\nI would rather swim than do anything else.\nOne day while doing chores,\nI had snuck away to go swimming",
-            dolphin:[{x:75,y:200,key:"dolphin1"},{x:200,y:250,key:"dolphin2"},{x:300,y:300,key:"dolphin3"}/*gray*/,{x:20,y:400,key:"dolphin4"},{x:50,y:300,key:"dolphin5"}]
+            dolphin:[{x:75,y:200,key:"dolphin1"},{x:200,y:250,key:"dolphin2"},{x:300,y:300,key:"dolphin3"}/*gray*/,{x:20,y:400,key:"dolphin4"},{x:50,y:300,key:"dolphin5"}],
+            nextArrow:{x:w-50,y:h/2,key:"arrow"}
             
+        },
+        {
+            background:{key:"waterBackground"},
+            sirena:{x:-10,y:150,key:"sirena2"},
+            nextArrow:{x:w-50,y:h/2,key:"arrow"}
         }
     
     
@@ -76,14 +83,14 @@ var gameState={
     
     
     preload:function(){
-        game.load.image("misty","assets/misty.png");
+        //game.load.image("misty","assets/misty.png");
         game.load.image("playButton","assets/playButton.png");
         //game.load.image("water","assets/water.png");
         game.load.image("arrow","assets/arrow.png");
         //game.load.image("ocean","assets/ocean.png");
         //game.load.image("ocean2","assets/ocean2.png");
         //game.load.image("starFish","assets/starFish.png");
-        //game.load.image("bubble","assets/bubble1.png");
+        game.load.image("bubble","assets/bubble1.png");
         game.load.image("islandBackground","assets/islandBackground.png");
         game.load.image("outdoor","assets/outdoor2.jpg");
         game.load.image("hut","assets/hut.png");
@@ -98,16 +105,22 @@ var gameState={
         game.load.image("dolphin3","assets/dolphin3.png");
         game.load.image("dolphin4","assets/dolphin4.png");
         game.load.image("dolphin5","assets/dolphin5.png");
+        game.load.image("introBackground","assets/introBackground.jpg");
+        game.load.image("atani","assets/atani.png");
+        
         
         
         game.load.audio("s1","assets/audio/s1.mp3");//intro
         game.load.audio("s2","assets/audio/s2.mp3");//scene2
         game.load.audio("s3","assets/audio/s3.mp3");
         game.load.audio("s4","assets/audio/s4.mp3");
+        game.load.audio("s5","assets/audio/s5.mp3");
         game.load.audio("awesome","assets/audio/awesome.mp3");
         game.load.audio("good_job","assets/audio/good_job.mp3");
         game.load.audio("almost_done","assets/audio/almost_done.mp3");
         game.load.audio("yeah_you_did_it","assets/audio/yeah_you_did_it.mp3");
+        
+        game.load.audio("pop","assets/audio/sounds/pop.mp3");
         
         game.load.audio("one","assets/audio/one.mp3");
         game.load.audio("two","assets/audio/two.mp3");
@@ -120,6 +133,7 @@ var gameState={
         //game.load.spritesheet("jellyFish","assets/jellyfish_spritesheet.png",323,295);
         //game.load.spritesheet("duck","assets/duck_walk.png",64,68);
         game.load.spritesheet("squid","assets/squid_spritesheet.png",64,64);
+        game.load.spritesheet("blueFish","assets/blueFish.png",167,125);
     },
     
     create:function(){
@@ -136,6 +150,8 @@ var gameState={
         this.a_s2 =game.add.audio("s2");
         this.a_s3=game.add.audio("s3");
         this.a_s4=game.add.audio("s4");
+        this.a_s5=game.add.audio("s5");
+        this.a_pop=game.add.audio("pop");
        
         
         //dolfin
@@ -155,8 +171,18 @@ var gameState={
         this.logsAudio=[this.awesome,this.good_job,this.almost_done,this.yeah_you_did_it];
         
         
-        this.soundsArray=[this.a_intro,this.a_s2,this.a_s3,this.a_s4,this.a_5,this.a_4,this.a_3,this.a_2,this.a_1];
+        this.soundsArray=[this.a_intro,this.a_s2,this.a_s3,this.a_s4,this.a_s5,this.a_5,this.a_4,this.a_3,this.a_2,this.a_1,this.a_pop];
         //this.sirenaSoundArray=[this.a_imSirena,this.a_sirena2,this.a_sirena3];
+        
+        //bubble emitter
+        this.bubbleEmitter = game.add.emitter(0,0,50);
+        this.bubbleEmitter.makeParticles("bubble");
+        this.bubbleEmitter.setXSpeed(-100,0);
+        this.bubbleEmitter.setYSpeed(0,0);
+        this.bubbleEmitter.setRotation(0,0);
+        this.bubbleEmitter.gravity=150;
+        this.bubbleEmitter.bounce.setTo(0.5,0.5);
+        
         
         //Draw the level 
         this.drawLevel();
@@ -177,13 +203,18 @@ var gameState={
     
     nextState:function(){
         console.log("Going to next state");
+        numLogs=-1;
+        numDolphin=5;
         this.currentLevel++;
         this.checkIfSoundIsPlaying();
         this.game.state.start("game",true,false,this.currentLevel);
         
+        
     },
     previousState:function(){
           console.log("Going to next state");
+        numLogs=-1;
+        numDolphin=5;
         this.currentLevel--;
         this.checkIfSoundIsPlaying();
         this.game.state.start("game",true,false,this.currentLevel);
@@ -194,11 +225,12 @@ var gameState={
         if(this.currentLevel==0){
             //First Level
             game.stage.backgroundColor =colors[randColor];
+            var background = game.add.sprite(0,0,level.background.key);
             //Intro misty
             
-            this.misty=game.add.sprite(level.misty.x,level.misty.y,level.misty.key);
-            this.misty.alpha=0;
-            this.game.add.tween(this.misty).to({alpha:1,x:0},500,Phaser.Easing.Exponential.Out,true);
+            this.atani=game.add.sprite(level.atani.x,level.atani.y,level.atani.key);
+            this.atani.alpha=0;
+            this.game.add.tween(this.atani).to({alpha:1,x:0},500,Phaser.Easing.Exponential.Out,true);
             this.a_intro.play();
             
             //Play button
@@ -220,7 +252,7 @@ var gameState={
                 
             
              
-             this.sirena = this.game.add.sprite(level.sirena.x,level.sirena.y,"sirena2")
+             this.sirena = this.game.add.sprite(level.sirena.x,level.sirena.y,level.sirena.key)
              //this.sirena = this.game.add.sprite(level.sirena.x,level.sirena.y,"sirena");
              this.sirena.scale.setTo(0.5);
              this.sirena.anchor.setTo(0.5);
@@ -327,8 +359,8 @@ var gameState={
              
             
         }else if(this.currentLevel==3){
-            //var background = game.add.sprite(0,0,level.background.key);
-            var background = game.add.tileSprite(0,0,this.game.width,this.game.height,level.background.key);
+            var background = game.add.sprite(0,0,level.background.key);
+            //var background = game.add.tileSprite(0,0,this.game.width,this.game.height,level.background.key);
             //background.autoScroll(-70,0);
             var style={font:"18px Arial",fill:"#fff",align:"center"}
             var sceneText=game.add.text(w/2,100,level.sceneText,style)
@@ -346,16 +378,65 @@ var gameState={
             
             dolphinGroup.forEach(function(element){
                 element.inputEnabled=true;
+                element.input.pixelPerfectClick=true;
                 element.events.onInputDown.add(this.killDolphin,this);
               
             },this);
             
+            var nextButton = game.add.button(level.nextArrow.x,level.nextArrow.y,level.nextArrow.key,this.nextState,this);
+            nextButton.anchor.setTo(0.5);
+            nextButton.scale.setTo(0.5);
+        
+            var previousButton = game.add.button(50,level.nextArrow.y,level.nextArrow.key,this.previousState,this);
+            previousButton.anchor.setTo(0.5);
+            previousButton.scale.setTo(0.5);
+            previousButton.scale.x=-0.5;
+
+        }else if(this.currentLevel==4){
+            var background = game.add.sprite(0,0,level.background.key);
+            this.a_s5.play();
+            var sirena = this.game.add.sprite(level.sirena.x-100,level.sirena.y,level.sirena.key);
+            sirena.angle+=45;
+            game.add.tween(sirena).to({x:700},7500,Phaser.Easing.Quadratic.InOut,true,0,1000,false);
             
+            var blueFishGroup = game.add.group();
+            var fish1 = blueFishGroup.create(-70,50,"blueFish");
+            var fish2 = blueFishGroup.create(600,70,"blueFish");
+            var fish3 = blueFishGroup.create(-70,175,"blueFish");
+            var fish4 = blueFishGroup.create(600,300,"blueFish");
+            var fish5 = blueFishGroup.create(-70,400,"blueFish");
+           
             
+            game.add.tween(fish1).to({x:600},game.rnd.integerInRange(6000, 11000),Phaser.Easing.Quadratic.InOut,true,0,1000,false);
+            game.add.tween(fish2).to({x:-50},game.rnd.integerInRange(6000, 11000),Phaser.Easing.Quadratic.InOut,true,0,1000,false);
+            game.add.tween(fish3).to({x:600},game.rnd.integerInRange(6000, 11000),Phaser.Easing.Quadratic.InOut,true,0,1000,false);
+            game.add.tween(fish4).to({x:-50},game.rnd.integerInRange(6000, 11000),Phaser.Easing.Quadratic.InOut,true,0,1000,false);
+            game.add.tween(fish5).to({x:600},game.rnd.integerInRange(6000, 11000),Phaser.Easing.Quadratic.InOut,true,0,1000,false);
             
+            this.particleBurst(fish1)
             
+            blueFishGroup.forEach(function(element){
+                
+                element.scale.setTo(0.5);
+                element.animations.add("swim",[0,1],game.rnd.integerInRange(3, 10),true);
+                element.animations.play("swim");
+            },this);
             
+            fish2.scale.setTo(-0.5,0.5);
+            fish4.scale.setTo(-0.5,0.5);
             
+            var nextButton = game.add.button(level.nextArrow.x,level.nextArrow.y,level.nextArrow.key,this.nextState,this);
+            nextButton.anchor.setTo(0.5);
+            nextButton.scale.setTo(0.5);
+        
+            var previousButton = game.add.button(50,level.nextArrow.y,level.nextArrow.key,this.previousState,this);
+            previousButton.anchor.setTo(0.5);
+            previousButton.scale.setTo(0.5);
+            previousButton.scale.x=-0.5;
+            
+            background.inputEnabled = true;
+            background.events.onInputDown.add(this.particleBurst,this);
+           
             
         }
         
@@ -383,8 +464,8 @@ var gameState={
         emitter.gravity=200;
         emitter.start(true, 2000, null, 10);
         this.a_pop.play();
-        //if we want to collide emitter we need to do it in the update method
-        //game.physics.arcade.collide(emitter);
+    //     //if we want to collide emitter we need to do it in the update method
+    //     //game.physics.arcade.collide(emitter);
     
     
     },
@@ -438,7 +519,8 @@ var gameState={
         numDolphin--;
         this.dolfinAudio[numDolphin].play();
         
-    }
+    },
+    
     
     // render:function(){
     //   if(this.currentLevel==2){
